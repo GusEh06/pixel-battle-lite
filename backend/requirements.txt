@@ -1,0 +1,40 @@
+# Web Framework
+# FastAPI es nuestro framework web principal. Incluye validación automática,
+# documentación interactiva (Swagger UI), y soporte nativo para async/await.
+# La notación [all] incluye uvicorn y otras utilidades recomendadas.
+fastapi[all]==0.128.0
+
+# Database
+# SQLAlchemy es nuestro ORM para trabajar con PostgreSQL de forma pythónica.
+# La versión 2.0 tiene mejor soporte para operaciones asíncronas.
+sqlalchemy==2.0.45
+
+# PostgreSQL adapter moderno con soporte async nativo.
+# La variante [binary] incluye librerías precompiladas para mejor rendimiento.
+psycopg[binary]==3.3.2
+
+# Alembic maneja migraciones de base de datos (cambios en la estructura de tablas).
+# Lo instalaremos cuando lo necesitemos, por ahora no es crítico para el MVP.
+# alembic==1.14.0
+
+# Configuration Management
+# python-dotenv carga variables de entorno desde archivos .env
+# Útil para no hardcodear contraseñas y configuraciones sensibles.
+python-dotenv==1.2.1
+
+# pydantic-settings extiende Pydantic para manejar configuraciones de aplicación.
+# Permite validar y tipar las variables de configuración.
+pydantic-settings==2.12.0
+
+# File Upload Support
+# python-multipart permite a FastAPI recibir archivos en formularios multipart.
+# Necesario si en el futuro queremos subir imágenes o templates.
+python-multipart==0.0.21
+
+# CORS Support
+# CORS ya viene incluido en FastAPI, no necesitamos instalarlo por separado.
+# Lo configuraremos directamente en el código cuando conectemos el frontend.
+
+# Development Tools (opcional, útil pero no crítico para el MVP)
+# uvicorn==0.40.0  # Ya viene con fastapi[all]
+# httpx==0.28.1    # Cliente HTTP async, útil para testing

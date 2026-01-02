@@ -1,0 +1,48 @@
+# ======================
+# Entornos virtuales
+# ======================
+venv/
+.env
+backend/.env
+
+# ======================
+# Python
+# ======================
+__pycache__/
+backend/app/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+
+# ======================
+# Bases de datos locales
+# ======================
+*.sqlite3
+*.db
+
+# ======================
+# Docker
+# ======================
+.env.docker
+docker-compose.override.yml
+
+# ======================
+# IDEs / Editores
+# ======================
+.vscode/
+.idea/
+.DS_Store
+
+# ======================
+# Testing / Coverage
+# ======================
+.coverage
+htmlcov/
+
+# ======================
+# Node / Frontend (por si acaso)
+# ======================
+node_modules/
+dist/
+build/

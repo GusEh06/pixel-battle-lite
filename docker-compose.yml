@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Servicio de base de datos PostgreSQL
+  # Este contenedor ejecuta PostgreSQL 15 en una imagen Alpine (ligera)
+  db:
+    image: postgres:15-alpine
+    container_name: pixelcanvas_db
+
+    # Variables de entorno para configurar PostgreSQL
+    # Estos valores los usaremos luego para conectarnos desde Python
+    environment:
+      POSTGRES_USER: pixeluser
+      POSTGRES_PASSWORD: pixelpass123
+      POSTGRES_DB: pixelcanvas
+
+    # Exponemos el puerto 5432 (puerto por defecto de PostgreSQL)
+    # El formato es "puerto_en_windows:puerto_en_contenedor"
+    ports:
+      - "5432:5432"
+
+    # Volumen para persistir datos
+    # Sin esto, cada vez que apagaras el contenedor perderías todos los datos
+    # Docker guarda la información en un volumen especial que sobrevive reinicios
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    # Política de reinicio: reiniciar automáticamente a menos que lo pares manualmente
+    restart: unless-stopped
+
+# Definición de volúmenes
+# Docker crea y maneja este volumen automáticamente
+volumes:
+  postgres_data:
