@@ -7,6 +7,8 @@ que los clientes pueden llamar para interactuar con el canvas.
 
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from typing import List
 import os
@@ -398,7 +400,7 @@ async def health_check(db: Session = Depends(get_db)):
     """
     try:
         # Intentar hacer una query simple a la BD para verificar conectividad
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db_status = "healthy"
     except Exception as e:
         db_status = f"unhealthy: {str(e)}"
@@ -418,11 +420,13 @@ async def http_exception_handler(request, exc):
     
     Formatea todas las respuestas de error de manera consistente.
     """
-    return {
-        "success": False,
-        "error": exc.detail if isinstance(exc.detail, dict) else {"message": exc.detail},
-        "status_code": exc.status_code
-    }
+    return JSONResponse(
+        status_code = exc.status_code,
+        content={
+            "success": False,
+            "error": exc.detail if isinstance(exc.detail, dict) else {"message": exc.detail}
+        }
+    )
 
 
 if __name__ == "__main__":
