@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Canvas Lite</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Contenedor principal de toda la aplicación -->
+    <div class="container">
+
+        <!-- Header con título y descripción -->
+        <header class="header">
+            <h1>🎨 Pixel Canvas Lite</h1>
+            <p class="subtitle">Canvas colaborativo 32x32 - Cooldown de 30 segundos</p>
+        </header>
+
+        <!-- Sección de estadísticas en tiempo real -->
+        <section class="stats-bar">
+            <div class="stat">
+                <span class="stat-label">Total Píxeles</span>
+                <span class="stat-value" id="total-pixels">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Usuarios Activos</span>
+                <span class="stat-value" id="active-users">1</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Tus Píxeles</span>
+                <span class="stat-value" id="user-pixels">0</span>
+            </div>
+        </section>
+
+        <!-- Área principal del canvas -->
+        <section class="canvas-section">
+            <!-- Canvas principal donde se dibuja el pixel art -->
+            <div class="canvas-container">
+                <canvas id="pixel-canvas" width="640" height="640"></canvas>
+
+                <!-- Canvas de la lupa (oculto por defecto) -->
+                <canvas id="magnifier-canvas" class="magnifier"></canvas>
+            </div>
+
+            <!-- Panel de información lateral -->
+            <aside class="info-panel">
+                <div class="info-card">
+                    <h3>🎯 Píxel Seleccionado</h3>
+                    <div id="pixel-info">
+                        <p>Haz click en el canvas</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>📜 Actividad Reciente</h3>
+                    <div id="recent-activity" class="activity-list">
+                        <p class="empty-state">Sin actividad aún</p>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <!-- Barra de controles inferior -->
+        <section class="controls-bar">
+            <!-- Selector de color -->
+            <div class="control-group">
+                <label for="color-picker">🎨 Color:</label>
+                <input type="color" id="color-picker" value="#FF6B6B">
+                <span id="color-display">#FF6B6B</span>
+            </div>
+
+            <!-- Indicador de cooldown -->
+            <div class="control-group">
+                <label>⏱️ Cooldown:</label>
+                <span id="cooldown-timer" class="cooldown-ready">Listo</span>
+            </div>
+
+            <!-- Instrucciones de uso -->
+            <div class="control-group">
+                <span class="hint">💡 Presiona <kbd>Z</kbd> para activar lupa</span>
+            </div>
+        </section>
+
+        <!-- Footer con información adicional -->
+        <footer class="footer">
+            <p>Hecho con 💜 | Proyecto Portfolio</p>
+        </footer>
+    </div>
+
+    <!-- Scripts de JavaScript (se cargan al final para que el DOM esté listo) -->
+    <script src="api.js"></script>
+    <script src="magnifier.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
