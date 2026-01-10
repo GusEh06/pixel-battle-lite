@@ -2,10 +2,6 @@
    APP.JS - Lógica Principal del Canvas
    =================================== */
 
-// Configuración del canvas
-const GRID_SIZE = 32;           // Tamaño del grid (32x32 píxeles)
-const PIXEL_SIZE = 20;          // Cada píxel lógico ocupa 20x20 px reales
-const CANVAS_SIZE = GRID_SIZE * PIXEL_SIZE;  // 640x640 px
 
 // Referencias a elementos del DOM
 const canvas = document.getElementById('pixel-canvas');

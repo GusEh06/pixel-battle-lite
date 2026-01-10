@@ -5,6 +5,10 @@
 // URL base del backend (cambiar si usas otro puerto/host)
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
+const GRID_SIZE = 32;
+const PIXEL_SIZE = 20;
+const CANVAS_SIZE = GRID_SIZE * PIXEL_SIZE;
+
 /* ===================================
    FUNCIONES AUXILIARES
    =================================== */
