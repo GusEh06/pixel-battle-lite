@@ -35,6 +35,11 @@ let canvasState = {};            // Estado actual del canvas {`x,y`: color}
 async function init() {
     console.log('🎨 Iniciando Pixel Canvas Lite...');
 
+    // 🔧 FIX: Sincronizar color inicial desde el HTML
+    selectedColor = colorPicker.value.toUpperCase();
+    colorDisplay.textContent = selectedColor;
+    console.log('🎨 Color inicial:', selectedColor);
+
     // 1. Dibujar el grid vacío
     drawEmptyGrid();
 
@@ -93,15 +98,14 @@ function drawEmptyGrid() {
  * @param {string} color - Color en formato #RRGGBB
  */
 function drawPixel(x, y, color) {
-    // Convertir coordenadas lógicas a píxeles reales
+    console.log(`🖌️ drawPixel llamado: (${x}, ${y}) color: ${color}`);
+
     const realX = x * PIXEL_SIZE;
     const realY = y * PIXEL_SIZE;
 
-    // Dibujar el píxel con el color
     ctx.fillStyle = color;
     ctx.fillRect(realX, realY, PIXEL_SIZE, PIXEL_SIZE);
 
-    // Redibujar el borde para que se vea el grid
     ctx.strokeStyle = '#EEEEEE';
     ctx.strokeRect(realX, realY, PIXEL_SIZE, PIXEL_SIZE);
 }
@@ -185,8 +189,43 @@ function setupEventListeners() {
     // Hover en el canvas para mostrar info del píxel
     canvas.addEventListener('mousemove', handleCanvasHover);
 
-    // Cambio de color en el picker
+    // 🔧 FIX: Escuchar AMBOS eventos (input Y change)
     colorPicker.addEventListener('input', handleColorChange);
+    colorPicker.addEventListener('change', handleColorChange);
+}
+
+/**
+ * Maneja el hover sobre el canvas para mostrar info
+ */
+function handleCanvasHover(event) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    const x = Math.floor(mouseX / PIXEL_SIZE);
+    const y = Math.floor(mouseY / PIXEL_SIZE);
+
+    // Validar coordenadas
+    if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) {
+        return;
+    }
+
+    // Obtener info del píxel del estado local
+    const key = `${x},${y}`;
+    const color = canvasState[key];
+
+    if (color) {
+        pixelInfoElement.innerHTML = `
+            <p><strong>Posición:</strong> (${x}, ${y})</p>
+            <p><strong>Color:</strong> ${color}</p>
+            <p style="background: ${color}; width: 40px; height: 40px; border: 2px solid #ccc; margin-top: 5px; border-radius: 4px;"></p>
+        `;
+    } else {
+        pixelInfoElement.innerHTML = `
+            <p><strong>Posición:</strong> (${x}, ${y})</p>
+            <p><em>Sin pintar</em></p>
+        `;
+    }
 }
 
 /**
@@ -214,23 +253,39 @@ async function handleCanvasClick(event) {
     }
 
     // 🔧 FIX: Leer el color directamente del picker para estar seguros
-    const currentColor = colorPicker.value.toUpperCase();
+    const colorToUse = colorPicker.value.toUpperCase();
 
-    console.log(`🖱️ Click en (${x}, ${y}) con color ${currentColor}`);
+    console.log(`🖱️ Click en (${x}, ${y}) con color ${colorToUse}`);
 
     // Intentar pintar el píxel
     try {
-        const pixel = await paintPixel(x, y, currentColor, userId);  // ← Usar currentColor
+        const response = await paintPixel(x, y, colorToUse, userId);
+
+        console.log('📦 Respuesta completa del backend:', JSON.stringify(response, null, 2));
+
+        // 🔧 Validar que la respuesta tenga la estructura esperada
+        if (!response || !response.pixel) {
+            console.error('❌ Respuesta inválida del backend:', response);
+            alert('Error: Respuesta inválida del servidor');
+            return;
+        }
+
+        const pixelData = response.pixel;
+        const finalColor = pixelData.color;
+
+        console.log('✅ Color extraído:', finalColor);
 
         // Actualizar el estado local
         const key = `${x},${y}`;
-        canvasState[key] = pixel.color;
+        canvasState[key] = finalColor;
 
         // Dibujar el píxel
-        drawPixel(x, y, pixel.color);
+        console.log('🖌️ Dibujando con color:', finalColor);
+        drawPixel(x, y, finalColor);
 
         // Iniciar cooldown
-        startCooldown(30);
+        const cooldownSeconds = response.cooldown_remaining || 30;
+        startCooldown(cooldownSeconds);
 
         // Actualizar estadísticas
         await updateStats();
@@ -240,10 +295,15 @@ async function handleCanvasClick(event) {
     } catch (error) {
         console.error('❌ Error al pintar píxel:', error);
 
-        if (error.message.includes('cooldown')) {
-            alert('⏱️ Debes esperar antes de pintar otro píxel');
+        // Mejorar el mensaje de error
+        const errorMessage = error.message || 'Error desconocido';
+
+        if (errorMessage.includes('cooldown') || errorMessage.includes('429')) {
+            alert('⏱️ Debes esperar el cooldown antes de pintar');
+        } else if (errorMessage.includes('petición')) {
+            alert('❌ Error de conexión con el servidor. Verifica que el backend esté corriendo.');
         } else {
-            alert('Error: ' + error.message);
+            alert('Error: ' + errorMessage);
         }
     }
 }
@@ -254,7 +314,10 @@ async function handleCanvasClick(event) {
 function handleColorChange(event) {
     selectedColor = event.target.value.toUpperCase();
     colorDisplay.textContent = selectedColor;
+
+    // 🔍 DEBUG: Ver que se está ejecutando
     console.log('🎨 Color cambiado a:', selectedColor);
+    console.log('   Event type:', event.type);
 }
 
 /* ===================================
