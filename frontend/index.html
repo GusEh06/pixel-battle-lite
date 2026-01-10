@@ -14,7 +14,7 @@
 
         <!-- Header con título y descripción -->
         <header class="header">
-            <h1>🎨 Pixel Canvas Lite</h1>
+            <h1>Pixel Canvas Lite</h1>
             <p class="subtitle">Canvas colaborativo 32x32 - Cooldown de 30 segundos</p>
         </header>
 
@@ -38,23 +38,25 @@
         <section class="canvas-section">
             <!-- Canvas principal donde se dibuja el pixel art -->
             <div class="canvas-container">
-                <canvas id="pixel-canvas" width="640" height="640"></canvas>
+                <div class="canvas-wrapper">
+                    <canvas id="pixel-canvas" width="640" height="640"></canvas>
 
-                <!-- Canvas de la lupa (oculto por defecto) -->
-                <canvas id="magnifier-canvas" class="magnifier"></canvas>
+                    <!-- Canvas de la lupa (oculto por defecto) -->
+                    <canvas id="magnifier-canvas" class="magnifier"></canvas>
+                </div>
             </div>
 
             <!-- Panel de información lateral -->
             <aside class="info-panel">
                 <div class="info-card">
-                    <h3>🎯 Píxel Seleccionado</h3>
+                    <h3>Píxel Seleccionado</h3>
                     <div id="pixel-info">
                         <p>Haz click en el canvas</p>
                     </div>
                 </div>
 
                 <div class="info-card">
-                    <h3>📜 Actividad Reciente</h3>
+                    <h3>Actividad Reciente</h3>
                     <div id="recent-activity" class="activity-list">
                         <p class="empty-state">Sin actividad aún</p>
                     </div>
@@ -66,14 +68,14 @@
         <section class="controls-bar">
             <!-- Selector de color -->
             <div class="control-group">
-                <label for="color-picker">🎨 Color:</label>
+                <label for="color-picker">Color:</label>
                 <input type="color" id="color-picker" value="#FF6B6B">
                 <span id="color-display">#FF6B6B</span>
             </div>
 
             <!-- Indicador de cooldown -->
             <div class="control-group">
-                <label>⏱️ Cooldown:</label>
+                <label>⏱Cooldown:</label>
                 <span id="cooldown-timer" class="cooldown-ready">Listo</span>
             </div>
 

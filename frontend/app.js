@@ -31,6 +31,9 @@ let canvasState = {};            // Estado actual del canvas {`x,y`: color}
 async function init() {
     console.log('🎨 Iniciando Pixel Canvas Lite...');
 
+    // 🔧 FIX: Asegurar que el dibujo sea nítido (pixel art)
+    ctx.imageSmoothingEnabled = false;
+
     // 🔧 FIX: Sincronizar color inicial desde el HTML
     selectedColor = colorPicker.value.toUpperCase();
     colorDisplay.textContent = selectedColor;
@@ -155,7 +158,7 @@ async function updateStats() {
     try {
         // Obtener info general del canvas
         const canvasInfo = await getCanvasInfo();
-        totalPixelsElement.textContent = canvasInfo.total_pixels_placed;
+        totalPixelsElement.textContent = canvasInfo.total_pixels_painted || 0;
 
         // Obtener stats del usuario
         const userStats = await getUserStats(userId);
@@ -377,7 +380,7 @@ async function updateRecentActivity() {
 
         // Generar HTML de la lista
         const activityHTML = recentPixels.map(pixel => {
-            const timeAgo = getTimeAgo(pixel.created_at);
+            const timeAgo = getTimeAgo(pixel.timestamp);
             return `
                 <div class="activity-item">
                     <div style="display: flex; align-items: center; gap: 8px;">

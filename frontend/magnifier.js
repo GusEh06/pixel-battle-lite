@@ -4,9 +4,9 @@
 
 
 // Configuración de la lupa
-const MAGNIFIER_RADIUS = 75;
-const MAGNIFIER_ZOOM = 4;
-const MAGNIFIER_BORDER_WIDTH = 4;
+const MAGNIFIER_RADIUS = 85;
+const MAGNIFIER_ZOOM = 2;
+const MAGNIFIER_BORDER_WIDTH = 0;
 const MAGNIFIER_BORDER_COLOR = '#667eea';
 
 // 🔧 FIX: Referencias al DOM (redefinir aquí)
@@ -169,29 +169,21 @@ function updateMagnifierPosition(event) {
 /**
  * Dibuja la lupa circular con zoom
  */
-/**
- * Dibuja la lupa circular con zoom
- */
-/**
- * Dibuja la lupa circular con zoom
- */
 function drawMagnifier() {
-    console.log('🎨 Dibujando lupa...');
+    // 🔧 Mantener nitidez
+    magnifierCtx.imageSmoothingEnabled = false;
 
     // Limpiar canvas anterior
     magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
 
-    // Validar coordenadas
     if (magnifierX < 0 || magnifierY < 0 ||
         magnifierX > CANVAS_SIZE || magnifierY > CANVAS_SIZE) {
-        console.warn('⚠️ Coordenadas fuera de rango:', magnifierX, magnifierY);
         return;
     }
 
-    // Guardar estado
     magnifierCtx.save();
 
-    // 1. CREAR MÁSCARA CIRCULAR
+    // 1. MÁSCARA CIRCULAR
     magnifierCtx.beginPath();
     magnifierCtx.arc(magnifierX, magnifierY, MAGNIFIER_RADIUS, 0, Math.PI * 2);
     magnifierCtx.clip();
@@ -205,71 +197,52 @@ function drawMagnifier() {
         MAGNIFIER_RADIUS * 2
     );
 
-    // 3. CALCULAR ÁREA A MAGNIFICAR
+    // 3. DIBUJAR LÍNEAS DEL CANVAS REAL (Zoom del grid #EEEEEE)
     const sourceSize = (MAGNIFIER_RADIUS * 2) / MAGNIFIER_ZOOM;
-    const sourceX = Math.max(0, magnifierX - sourceSize / 2);
-    const sourceY = Math.max(0, magnifierY - sourceSize / 2);
+    const startX = Math.floor((magnifierX - sourceSize / 2) / PIXEL_SIZE);
+    const startY = Math.floor((magnifierY - sourceSize / 2) / PIXEL_SIZE);
+    const endX = Math.ceil((magnifierX + sourceSize / 2) / PIXEL_SIZE);
+    const endY = Math.ceil((magnifierY + sourceSize / 2) / PIXEL_SIZE);
 
-    const destX = magnifierX - MAGNIFIER_RADIUS;
-    const destY = magnifierY - MAGNIFIER_RADIUS;
-    const destSize = MAGNIFIER_RADIUS * 2;
+    magnifierCtx.strokeStyle = '#EEEEEE'; // Mismo color que el canvas real
+    magnifierCtx.lineWidth = 1;
 
-    // 4. COPIAR DEL CANVAS PRINCIPAL
-    try {
-        magnifierCtx.drawImage(
-            mainCanvas,              // 🔧 Usar mainCanvas, no canvas
-            sourceX, sourceY,
-            sourceSize, sourceSize,
-            destX, destY,
-            destSize, destSize
-        );
-    } catch (error) {
-        console.error('❌ Error al copiar imagen:', error);
+    for (let x = startX; x <= endX; x++) {
+        for (let y = startY; y <= endY; y++) {
+            // Posición con zoom
+            const posX = magnifierX + (x * PIXEL_SIZE - magnifierX) * MAGNIFIER_ZOOM;
+            const posY = magnifierY + (y * PIXEL_SIZE - magnifierY) * MAGNIFIER_ZOOM;
+            const size = PIXEL_SIZE * MAGNIFIER_ZOOM;
+
+            // Dibujar el recuadro del grid
+            magnifierCtx.strokeRect(posX, posY, size, size);
+
+            // 4. DIBUJAR EL PÍXEL SI ESTÁ PINTADO
+            const key = `${x},${y}`;
+            const color = canvasState[key];
+            if (color) {
+                magnifierCtx.fillStyle = color;
+                magnifierCtx.fillRect(posX, posY, size, size);
+                // Volver a dibujar el borde sobre el color para que se vea igual que en el canvas
+                magnifierCtx.strokeRect(posX, posY, size, size);
+            }
+        }
     }
 
-    // 5. GRID
-    drawMagnifiedGrid();
-
-    // 6. CRUZ
+    // 5. CRUZ DE REFERENCIA
     drawCrosshair();
 
-    // Restaurar
     magnifierCtx.restore();
 
-    // 7. BORDE
+    // 6. BORDE DE LA LUPA
     drawMagnifierBorder();
-
-    console.log('✅ Lupa dibujada');
 }
 
 /**
  * Dibuja el grid ampliado dentro de la lupa
  */
 function drawMagnifiedGrid() {
-    // Calcular cuántos píxeles lógicos caben en la lupa
-    const pixelsInView = (MAGNIFIER_RADIUS * 2) / MAGNIFIER_ZOOM / PIXEL_SIZE;
-    const gridSpacing = PIXEL_SIZE * MAGNIFIER_ZOOM;
-
-    magnifierCtx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-    magnifierCtx.lineWidth = 1;
-
-    // Líneas verticales
-    for (let i = 0; i <= Math.ceil(pixelsInView); i++) {
-        const x = magnifierX - MAGNIFIER_RADIUS + (i * gridSpacing);
-        magnifierCtx.beginPath();
-        magnifierCtx.moveTo(x, magnifierY - MAGNIFIER_RADIUS);
-        magnifierCtx.lineTo(x, magnifierY + MAGNIFIER_RADIUS);
-        magnifierCtx.stroke();
-    }
-
-    // Líneas horizontales
-    for (let i = 0; i <= Math.ceil(pixelsInView); i++) {
-        const y = magnifierY - MAGNIFIER_RADIUS + (i * gridSpacing);
-        magnifierCtx.beginPath();
-        magnifierCtx.moveTo(magnifierX - MAGNIFIER_RADIUS, y);
-        magnifierCtx.lineTo(magnifierX + MAGNIFIER_RADIUS, y);
-        magnifierCtx.stroke();
-    }
+    // Función desactivada: ya no dibujamos el grid para mantener la lupa limpia y nítida
 }
 
 /**

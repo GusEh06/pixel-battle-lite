@@ -38,7 +38,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(white) 100%);
     min-height: 100vh;
     /* Mínimo altura de la ventana */
     display: flex;
@@ -130,10 +130,8 @@ body {
     margin-bottom: 25px;
 }
 
-/* Contenedor del canvas con posición relativa para la lupa */
+/* Contenedor del canvas con padding de área de trabajo */
 .canvas-container {
-    position: relative;
-    /* Para posicionar la lupa absolutamente dentro */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -142,17 +140,32 @@ body {
     padding: 20px;
 }
 
-/* Canvas principal */
-#pixel-canvas {
+/* Envoltura interna para centrar la lupa y aplicar clipping */
+.canvas-wrapper {
+    position: relative;
+    line-height: 0;
+    /* Evitar espacio debajo del canvas */
     border: 3px solid var(--border-color);
-    border-radius: 8px;
-    cursor: crosshair;
-    /* Cursor de cruz para pintar */
+    border-radius: 10px;
     box-shadow: var(--shadow);
+    overflow: hidden;
+    /* IMPORTANTE: Confinar la lupa al área del canvas */
+    cursor: crosshair;
 }
 
-/* Efecto hover en el canvas */
-#pixel-canvas:hover {
+/* Canvas principal */
+#pixel-canvas {
+    border: none;
+    /* Borde movido al wrapper */
+    border-radius: 0;
+    display: block;
+    /* 🔧 FIX: Asegurar nitidez absoluta en todos los navegadores */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Efecto hover interactuando con el wrapper */
+.canvas-wrapper:hover {
     border-color: var(--primary-color);
 }
 
